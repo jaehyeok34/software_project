@@ -8,8 +8,7 @@ import (
 	"software/room"
 )
 
-type System struct {
-}
+type System struct{}
 
 func NewChatSystem() *System {
 	return &System{}
