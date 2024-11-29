@@ -12,8 +12,18 @@ type Player struct {
 	Conn net.Conn
 }
 
-func NewPlayer() *Player {
+func New() *Player {
 	return &Player{}
+}
+
+func (c *Player) ConnectAndListen(network string, address string) error {
+	err := c.Connect(network, address)
+	if err != nil {
+		return err
+	}
+	go c.Listen()
+
+	return nil
 }
 
 func (c *Player) Connect(network string, address string) error {
@@ -28,6 +38,17 @@ func (c *Player) Connect(network string, address string) error {
 
 	c.Conn = conn
 	return nil
+}
+
+func (c *Player) Listen() {
+	for {
+		f, err := socket.Read(c.Conn)
+		if err != nil {
+			fmt.Println("Listen 문제:", err)
+		}
+
+		fmt.Println(f.Args)
+	}
 }
 
 func (c *Player) Chat(message string) error {

@@ -32,3 +32,15 @@ func (s *Server) read(conn net.Conn) {
 	// TODO: req.Event 확인 후 System 동작
 	s.Process(req.Event, req.Args...)
 }
+
+func (r *Server) Process(key string, args ...interface{}) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	if !r.has(key) {
+		fmt.Println("process failed: key not found")
+		return
+	}
+
+	r.systems[key].Run(r.clients, args...)
+}

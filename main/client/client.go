@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	player := card.NewPlayer()
-	if err := player.Connect("tcp", "localhost:9999"); err != nil {
+	player := card.New()
+	if err := player.ConnectAndListen("tcp", "localhost:9999"); err != nil {
 		log.Fatal("문제 발생:", err)
 	}
 

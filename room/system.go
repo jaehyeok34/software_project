@@ -29,18 +29,6 @@ func (r *Server) UpdateSystem(key string, newSystem System) {
 	r.systems[key] = newSystem
 }
 
-func (r *Server) Process(key string, args ...interface{}) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	if !r.has(key) {
-		fmt.Println("process failed: key not found")
-		return
-	}
-
-	r.systems[key].Run(r.clients, args...)
-}
-
 func (r *Server) has(key string) bool {
 	if v := r.systems[key]; v != nil {
 		return true

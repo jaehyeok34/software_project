@@ -34,7 +34,7 @@ func (cs *System) Run(conns []net.Conn, args ...interface{}) {
 	for _, conn := range conns {
 		res := new(socket.Frame)
 		res.Args = append(res.Args, message)
-		_ = conn
+		socket.Write(conn, res)
 	}
 }
 
