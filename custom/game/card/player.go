@@ -1,6 +1,7 @@
 package card
 
 import (
+	suffle "software/custom/game/card/system/shuffle"
 	"software/import/client"
 	"software/import/system/chat"
 )
@@ -15,10 +16,12 @@ func New(name string) *Player {
 
 func (p *Player) Process() {
 	for {
-		f := <-p.Frame
+		f := <-p.Ch
 		switch f.Event {
 		case chat.Key:
 			p.receiveChat(f.Args)
+		case suffle.Key:
+			p.receiveShuffle(f.Args)
 		}
 	}
 }

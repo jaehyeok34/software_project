@@ -17,8 +17,8 @@ func New(system room.System) *System {
 	return &System{System: system}
 }
 
-func (s *System) Run(conns []net.Conn, args ...interface{}) {
-	s.System.Run(conns, args...) // chat.System이 호출됨
+func (s *System) Run(src net.Conn, conns []net.Conn, args ...interface{}) {
+	s.System.Run(src, conns, args...) // chat.System이 호출됨
 }
 
-var _ room.System = &System{}
+var _ room.System = new(System)

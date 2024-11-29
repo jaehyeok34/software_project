@@ -19,11 +19,13 @@ func New(system room.System) *System {
 	return &System{System: system}
 }
 
-func (s *System) Run(conns []net.Conn, args ...interface{}) {
+func (s *System) Run(src net.Conn, conns []net.Conn, args ...interface{}) {
 	for i, arg := range args {
 		if v, ok := arg.(string); ok {
 			args[i] = fmt.Sprintf("[%s] %s", time.Now().Format("15:04:05"), v)
 		}
 	}
-	s.System.Run(conns, args...)
+	s.System.Run(src, conns, args...)
 }
+
+var _ room.System = new(System)

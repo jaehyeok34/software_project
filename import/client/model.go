@@ -8,16 +8,16 @@ import (
 )
 
 type Model struct {
-	Name  string
-	Mu    sync.RWMutex
-	Conn  net.Conn
-	Frame chan *socket.Frame
+	Name string
+	Mu   sync.RWMutex
+	Conn net.Conn
+	Ch   chan *socket.Frame
 }
 
 func New(name string) *Model {
 	return &Model{
-		Name:  name,
-		Frame: make(chan *socket.Frame),
+		Name: name,
+		Ch:   make(chan *socket.Frame),
 	}
 }
 
@@ -52,6 +52,6 @@ func (c *Model) Listen() {
 			fmt.Println("Listen 문제:", err)
 		}
 
-		c.Frame <- f
+		c.Ch <- f
 	}
 }

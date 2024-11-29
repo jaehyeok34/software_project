@@ -3,6 +3,7 @@ package chat
 import (
 	"fmt"
 	"net"
+	"software/import/room"
 	"software/import/socket"
 )
 
@@ -14,7 +15,7 @@ func New() *System {
 	return &System{}
 }
 
-func (cs *System) Run(conns []net.Conn, args ...interface{}) {
+func (s *System) Run(src net.Conn, conns []net.Conn, args ...interface{}) {
 	if len(conns) == 0 {
 		fmt.Println("ChatSystem(Run): missing []net.Conn")
 		return
@@ -33,9 +34,11 @@ func (cs *System) Run(conns []net.Conn, args ...interface{}) {
 
 	fmt.Println("received:", message)
 	for _, conn := range conns {
-		res := new(socket.Frame)
-		res.Event = Key
-		res.Args = append(res.Args, message)
-		socket.Write(conn, res)
+		f := new(socket.Frame)
+		f.Event = Key
+		f.Args = append(f.Args, message)
+		socket.Write(conn, f)
 	}
 }
+
+var _ room.System = new(System)

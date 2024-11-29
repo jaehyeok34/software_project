@@ -19,7 +19,7 @@ func main() {
 
 	for {
 		// ---------------테스트용 코드임 삭제하셈--------------------
-		fmt.Println("1. 채팅")
+		fmt.Println("1. 채팅, 2. 셔플")
 		message, err := scanner()
 		if err != nil {
 			fmt.Println("scanner error")
@@ -29,6 +29,9 @@ func main() {
 		switch message {
 		case "1":
 			sendChat(p)
+
+		case "2":
+			p.Suffle()
 		}
 	}
 }

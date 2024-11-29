@@ -9,3 +9,11 @@ func (p *Player) receiveChat(message []interface{}) {
 		}
 	}
 }
+
+func (p *Player) receiveShuffle(args []interface{}) {
+	for _, msg := range args {
+		if str, ok := msg.(string); ok {
+			fmt.Println(str)
+		}
+	}
+}

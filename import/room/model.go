@@ -65,11 +65,11 @@ func (m *Model) read(conn net.Conn) {
 			fmt.Println("read error:", err)
 		}
 
-		m.run(req.Event, req.Args...)
+		m.run(conn, req.Event, req.Args...)
 	}
 }
 
-func (m *Model) run(key string, args ...interface{}) {
+func (m *Model) run(src net.Conn, key string, args ...interface{}) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
@@ -78,5 +78,5 @@ func (m *Model) run(key string, args ...interface{}) {
 		return
 	}
 
-	m.systems[key].Run(m.clients, args...)
+	m.systems[key].Run(src, m.clients, args...)
 }
