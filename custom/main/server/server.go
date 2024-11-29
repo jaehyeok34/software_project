@@ -13,7 +13,7 @@ func main() {
 	if err := room.ListenAndServe("tcp", "localhost:9999"); err != nil {
 		log.Fatal(err)
 	}
-	defer room.Server.Close()
+	defer room.Listener.Close()
 
 	chatSystem := chat.New()
 	room.AddSystem(chat.Key, chatSystem)

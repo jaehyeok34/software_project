@@ -9,7 +9,7 @@ type System interface {
 	Run(conns []net.Conn, args ...interface{})
 }
 
-func (r *Server) AddSystem(key string, system System) {
+func (r *Model) AddSystem(key string, system System) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -17,7 +17,7 @@ func (r *Server) AddSystem(key string, system System) {
 	fmt.Println("system length:", len(r.systems))
 }
 
-func (r *Server) UpdateSystem(key string, newSystem System) {
+func (r *Model) UpdateSystem(key string, newSystem System) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -29,7 +29,7 @@ func (r *Server) UpdateSystem(key string, newSystem System) {
 	r.systems[key] = newSystem
 }
 
-func (r *Server) has(key string) bool {
+func (r *Model) has(key string) bool {
 	if v := r.systems[key]; v != nil {
 		return true
 	}

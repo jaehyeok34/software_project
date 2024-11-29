@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func (s *Server) ListenAndServe(network string, address string) error {
+func (s *Model) ListenAndServe(network string, address string) error {
 	if err := s.Listen(network, address); err != nil {
 		return err
 	}
@@ -15,7 +15,7 @@ func (s *Server) ListenAndServe(network string, address string) error {
 	return nil
 }
 
-func (s *Server) Listen(network string, address string) error {
+func (s *Model) Listen(network string, address string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -24,17 +24,17 @@ func (s *Server) Listen(network string, address string) error {
 		return err
 	}
 
-	s.Server = server
+	s.Listener = server
 
 	go s.Accept()
 
 	return nil
 }
 
-func (s *Server) Accept() {
+func (s *Model) Accept() {
 	for {
 		s.mu.RLock()
-		conn, err := s.Server.Accept()
+		conn, err := s.Listener.Accept()
 		if err != nil {
 			fmt.Println("클라이언트를 받아들이는 데 문제가 생김", err)
 		}
@@ -44,7 +44,7 @@ func (s *Server) Accept() {
 	}
 }
 
-func (s *Server) Serve() {
+func (s *Model) Serve() {
 	for {
 		s.mu.RLock()
 		for i, client := range s.clients {
@@ -57,7 +57,7 @@ func (s *Server) Serve() {
 	}
 }
 
-func (s *Server) Append(conn net.Conn) {
+func (s *Model) Append(conn net.Conn) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
