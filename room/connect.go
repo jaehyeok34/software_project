@@ -2,49 +2,75 @@ package room
 
 import (
 	"fmt"
-	"log"
 	"net"
+	"software/socket"
+	"time"
 )
 
-func (r *Room) Append(conn net.Conn) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	r.clients = append(r.clients, conn)
-}
-
-func (r *Room) ListenAndServe(network string, address string) error {
-	if err := r.Listen(network, address); err != nil {
+func (s *Server) ListenAndServe(network string, address string) error {
+	if err := s.Listen(network, address); err != nil {
 		return err
 	}
 
-	go r.Serve()
+	go s.Serve()
 	return nil
 }
 
-func (r *Room) Listen(network string, address string) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
+func (s *Server) Listen(network string, address string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	server, err := net.Listen(network, address)
 	if err != nil {
 		return err
 	}
 
-	r.Server = server
+	s.Server = server
+
+	go s.Accept()
+
 	return nil
 }
 
-func (r *Room) Serve() {
+func (s *Server) Accept() {
 	for {
-		conn, err := r.Server.Accept()
+		s.mu.RLock()
+		conn, err := s.Server.Accept()
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println("클라이언트를 받아들이는 데 문제가 생김", err)
 		}
-		r.Append(conn)
+		s.mu.RUnlock()
 
-		r.mu.RLock()
-		fmt.Println("클라이언트 추가 함( 현재 클라이언트 수:", len(r.clients), ")")
-		r.mu.RUnlock()
+		s.Append(conn)
 	}
+}
+
+func (s *Server) Serve() {
+	for {
+		s.mu.RLock()
+		for i, client := range s.clients {
+			go s.read(client)
+			fmt.Println(i, "번 쨰 client 데이터 읽는 중")
+		}
+		s.mu.RUnlock()
+
+		time.Sleep(time.Second)
+	}
+}
+
+func (s *Server) read(conn net.Conn) {
+	data, err := socket.Receive(conn)
+	if err != nil {
+		fmt.Println("read error:", err)
+	}
+
+	fmt.Println(string(data))
+}
+
+func (s *Server) Append(conn net.Conn) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.clients = append(s.clients, conn)
+	fmt.Println("현재 클라이언트 수:", len(s.clients))
 }

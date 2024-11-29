@@ -7,7 +7,6 @@ import (
 	"time"
 )
 
-// time stamp decorator
 type TimeStamp struct {
 	System room.System
 }

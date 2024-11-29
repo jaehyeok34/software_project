@@ -5,9 +5,7 @@ import (
 	"log"
 	"net"
 	"software/room"
-	"software/system/base/chat"
-	"software/system/base/chat/decorator"
-	"time"
+	"software/socket"
 )
 
 func main() {
@@ -18,31 +16,35 @@ func main() {
 	}
 	defer room.Server.Close()
 
-	chatSystem := chat.NewChatSystem()
-	room.AddSystem(chatSystem)
-	room.UpdateSystem(chatSystem, &decorator.TimeStamp{System: chatSystem})
+	// chatSystem := chat.New()
+	// room.AddSystem(chatSystem)
+	// room.UpdateSystem(chatSystem, &decorator.TimeStamp{System: chatSystem})
 
-	// client 생성 코드(임시)
-	go func() {
+	clientTest()
+}
+
+func clientTest() {
+	for {
+		var input string
+		fmt.Print("> ")
+		_, err := fmt.Scan(&input)
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		conn, err := net.Dial("tcp", "localhost:9999")
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer conn.Close()
 
-		buf := make([]byte, 256)
-		for {
-			n, err := conn.Read(buf)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			fmt.Println(string(buf[:n]))
+		fmt.Println("접속 성공")
+		if err := socket.Send(conn, []byte("hello world")); err != nil {
+			log.Fatal(err)
 		}
-	}()
 
-	for {
-		room.Process(&chat.System{}, "hello world")
-		time.Sleep(time.Second)
+		// conn.Close()
+
+		// time.Sleep(time.Second * 3)
+		// conn.Close()
 	}
 }

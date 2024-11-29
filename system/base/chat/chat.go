@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"reflect"
 	"software/room"
 )
 
 type System struct{}
 
-func NewChatSystem() *System {
+func New() *System {
 	return &System{}
 }
 
@@ -32,7 +31,6 @@ func (cs *System) Run(conns []net.Conn, args ...interface{}) {
 		fmt.Println("ChatSystem(Run): missing message(string)")
 	}
 
-	fmt.Println("client length:", len(conns))
 	for i, conn := range conns {
 		_, err := conn.Write([]byte(message))
 		if err != nil {
@@ -40,10 +38,6 @@ func (cs *System) Run(conns []net.Conn, args ...interface{}) {
 		}
 
 	}
-}
-
-func Type() reflect.Type {
-	return reflect.TypeOf(&System{})
 }
 
 var _ room.System = &System{}
