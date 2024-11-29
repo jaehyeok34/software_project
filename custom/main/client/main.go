@@ -1,10 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
+	"os"
 	"software/custom/game/card"
-	"time"
 )
 
 func main() {
@@ -13,10 +14,17 @@ func main() {
 		log.Fatal("문제 발생:", err)
 	}
 
+	go p.Process()
+
 	for {
 		// ---------------테스트용 코드임 삭제하셈--------------------
-		p.Chat("hello world")
-		fmt.Println(p.Name, "메시지 보냄")
-		time.Sleep(time.Second)
+		scanner := bufio.NewScanner(os.Stdin)
+		if scanner.Scan() {
+			p.SendChat(scanner.Text())
+		}
+
+		if err := scanner.Err(); err != nil {
+			fmt.Println("스캔에 문제 생김")
+		}
 	}
 }

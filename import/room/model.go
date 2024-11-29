@@ -22,18 +22,57 @@ func New() *Model {
 	}
 }
 
-func (m *Model) read(conn net.Conn) {
-	req, err := socket.Read(conn)
+func (m *Model) Listen(network string, address string) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	server, err := net.Listen(network, address)
 	if err != nil {
-		fmt.Println("read error:", err)
-		return
+		return err
 	}
 
-	// TODO: req.Event 확인 후 System 동작
-	m.Process(req.Event, req.Args...)
+	m.Listener = server
+
+	go m.Accept()
+	return nil
 }
 
-func (m *Model) Process(key string, args ...interface{}) {
+func (m *Model) Accept() {
+	for {
+		conn, err := m.Listener.Accept()
+		if err != nil {
+			fmt.Println("클라이언트를 받아들이는 데 문제가 생김", err)
+		}
+
+		m.Append(conn)
+	}
+}
+
+func (m *Model) Append(conn net.Conn) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	m.clients = append(m.clients, conn)
+	fmt.Println("현재 클라이언트 수:", len(m.clients))
+
+	go m.read(conn)
+}
+
+func (m *Model) read(conn net.Conn) {
+	for {
+		fmt.Println("읽기 중...")
+		req, err := socket.Read(conn) // blocking
+		if err != nil {
+			fmt.Println("read error:", err)
+		}
+
+		fmt.Println("읽기 성공")
+
+		m.run(req.Event, req.Args...)
+	}
+}
+
+func (m *Model) run(key string, args ...interface{}) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
@@ -43,4 +82,5 @@ func (m *Model) Process(key string, args ...interface{}) {
 	}
 
 	m.systems[key].Run(m.clients, args...)
+	fmt.Println("처리 완료")
 }

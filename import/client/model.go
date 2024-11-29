@@ -8,13 +8,17 @@ import (
 )
 
 type Model struct {
-	Name string
-	mu   sync.RWMutex
-	Conn net.Conn
+	Name  string
+	Mu    sync.RWMutex
+	Conn  net.Conn
+	Frame chan *socket.Frame
 }
 
 func New(name string) *Model {
-	return &Model{Name: name}
+	return &Model{
+		Name:  name,
+		Frame: make(chan *socket.Frame),
+	}
 }
 
 func (m *Model) ConnectAndListen(network string, address string) error {
@@ -28,8 +32,8 @@ func (m *Model) ConnectAndListen(network string, address string) error {
 }
 
 func (m *Model) Connect(network string, address string) error {
-	m.mu.Lock()
-	defer m.mu.Unlock()
+	m.Mu.Lock()
+	defer m.Mu.Unlock()
 
 	conn, err := net.Dial(network, address)
 	if err != nil {
@@ -48,6 +52,6 @@ func (c *Model) Listen() {
 			fmt.Println("Listen 문제:", err)
 		}
 
-		fmt.Println(f.Args)
+		c.Frame <- f
 	}
 }

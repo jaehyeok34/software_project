@@ -9,28 +9,29 @@ type System interface {
 	Run(conns []net.Conn, args ...interface{})
 }
 
-func (r *Model) AddSystem(key string, system System) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
+func (m *Model) AddSystem(key string, system System) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 
-	r.systems[key] = system
-	fmt.Println("system length:", len(r.systems))
+	m.systems[key] = system
 }
 
-func (r *Model) UpdateSystem(key string, newSystem System) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	if !r.has(key) {
+func (m *Model) UpdateSystem(key string, newSystem System) {
+	if !m.has(key) {
 		fmt.Println("update failed: key not found")
 		return
 	}
 
-	r.systems[key] = newSystem
+	m.mu.Lock()
+	m.systems[key] = newSystem
+	m.mu.Unlock()
 }
 
-func (r *Model) has(key string) bool {
-	if v := r.systems[key]; v != nil {
+func (m *Model) has(key string) bool {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	if v := m.systems[key]; v != nil {
 		return true
 	}
 

@@ -10,7 +10,7 @@ import (
 
 func main() {
 	room := room.New()
-	if err := room.ListenAndServe("tcp", "localhost:9999"); err != nil {
+	if err := room.Listen("tcp", "localhost:9999"); err != nil {
 		log.Fatal(err)
 	}
 	defer room.Listener.Close()
