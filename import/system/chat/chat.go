@@ -15,7 +15,7 @@ func New() *System {
 	return &System{}
 }
 
-func (s *System) Run(src net.Conn, conns []net.Conn, args ...interface{}) {
+func (s *System) Run(src *room.Connection, conns []net.Conn, args ...interface{}) {
 	if len(conns) == 0 {
 		fmt.Println("ChatSystem(Run): missing []net.Conn")
 		return
@@ -32,9 +32,10 @@ func (s *System) Run(src net.Conn, conns []net.Conn, args ...interface{}) {
 		fmt.Println("ChatSystem(Run): missing message(string)")
 	}
 
-	fmt.Println("received:", message)
+	fmt.Println(src.Name, "received:", message)
 	for _, conn := range conns {
 		f := new(socket.Frame)
+		f.Name = src.Name
 		f.Event = Key
 		f.Args = append(f.Args, message)
 		socket.Write(conn, f)

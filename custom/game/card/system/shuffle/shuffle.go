@@ -1,4 +1,4 @@
-package suffle
+package shuffle
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ func New() *System {
 	return &System{}
 }
 
-func (s *System) Run(src net.Conn, conns []net.Conn, args ...interface{}) {
+func (s *System) Run(src *room.Connection, conns []net.Conn, args ...interface{}) {
 	if len(conns) == 0 {
 		fmt.Println("ChatSystem(Run): missing []net.Conn")
 		return
@@ -27,9 +27,10 @@ func (s *System) Run(src net.Conn, conns []net.Conn, args ...interface{}) {
 	fmt.Println("카드 섞기가 완료했습니다.")
 
 	f := new(socket.Frame)
+	f.Name = src.Name
 	f.Event = Key
 	f.Args = append(f.Args, "카드를 섞었습니다.")
-	socket.Write(src, f)
+	socket.Write(src.Conn, f)
 }
 
 var _ room.System = new(System)

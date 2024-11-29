@@ -1,8 +1,10 @@
 package room
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
+	"software/import/client"
 	"software/import/socket"
 	"sync"
 )
@@ -10,16 +12,19 @@ import (
 type Model struct {
 	mu       sync.RWMutex
 	Listener net.Listener
-	clients  map[uint]net.Conn
+	clients  map[string]*Connection
 	systems  map[string]System
 }
 
-var index uint = 0
+type Connection struct {
+	Name string
+	Conn net.Conn
+}
 
 func New() *Model {
 	return &Model{
 		Listener: nil,
-		clients:  make(map[uint]net.Conn),
+		clients:  make(map[string]*Connection),
 		systems:  make(map[string]System),
 	}
 }
@@ -46,28 +51,35 @@ func (m *Model) Accept() {
 			fmt.Println("클라이언트를 받아들이는 데 문제가 생김", err)
 		}
 
-		m.Append(conn)
+		n := new(client.Name)
+		decoder := json.NewDecoder(conn)
+		if err := decoder.Decode(n); err != nil {
+			fmt.Println("연결 실패")
+			continue
+		}
+
+		m.Append(n.Value, conn)
 	}
 }
 
-func (m *Model) Append(conn net.Conn) {
+func (m *Model) Append(name string, conn net.Conn) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	index++
-	m.clients[index] = conn
+	c := &Connection{Name: name, Conn: conn}
+	m.clients[c.Name] = c
 	fmt.Println("현재 클라이언트 수:", len(m.clients))
 
-	go m.read(index, conn)
+	go m.read(c)
 }
 
-func (m *Model) read(key uint, conn net.Conn) {
+func (m *Model) read(conn *Connection) {
 	for {
-		fmt.Println(key, "read 하는 중")
-		req, err := socket.Read(conn) // blocking
+		fmt.Println(conn.Name, "read 하는 중")
+		req, err := socket.Read(conn.Conn) // blocking
 		if err != nil {
-			fmt.Println(key, "read error:", err)
-			delete(m.clients, key)
+			fmt.Println(conn.Name, "read error:", err)
+			delete(m.clients, conn.Name)
 			fmt.Println("삭제 후:", len(m.clients))
 			return
 		}
@@ -76,7 +88,7 @@ func (m *Model) read(key uint, conn net.Conn) {
 	}
 }
 
-func (m *Model) run(src net.Conn, key string, args ...interface{}) {
+func (m *Model) run(src *Connection, key string, args ...interface{}) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
@@ -87,7 +99,7 @@ func (m *Model) run(src net.Conn, key string, args ...interface{}) {
 
 	var conns []net.Conn
 	for _, conn := range m.clients {
-		conns = append(conns, conn)
+		conns = append(conns, conn.Conn)
 	}
 
 	m.systems[key].Run(src, conns, args...)

@@ -6,7 +6,7 @@ import (
 )
 
 type System interface {
-	Run(src net.Conn, conns []net.Conn, args ...interface{})
+	Run(src *Connection, conns []net.Conn, args ...interface{})
 }
 
 func (m *Model) AddSystem(key string, system System) {

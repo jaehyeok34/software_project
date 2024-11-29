@@ -4,18 +4,21 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
-	"software/custom/game/card"
+	"software/custom/game/card/player"
+	"software/import/client"
 	"time"
 )
 
 func main() {
-	p := card.New("cilent1")
-	if err := p.ConnectAndListen("tcp", "localhost:9999"); err != nil {
+	m := client.New(fmt.Sprintf("%s%d", "client", rand.Int()))
+	fmt.Println(m.Name)
+	if err := m.ConnectAndListen("tcp", "localhost:9999"); err != nil {
 		log.Fatal("문제 발생:", err)
 	}
 
-	go p.Process()
+	go player.Process(m)
 
 	// UI(CLI 기반)
 	for {
@@ -28,10 +31,10 @@ func main() {
 
 		switch message {
 		case "1":
-			sendChat(p)
+			sendChat(m)
 
 		case "2":
-			p.Suffle()
+			player.Suffle(m)
 		}
 	}
 }
@@ -51,7 +54,7 @@ func scanner() (string, error) {
 	return message, nil
 }
 
-func sendChat(p *card.Player) {
+func sendChat(m *client.Model) {
 	fmt.Print("> ")
 	message, err := scanner()
 	if err != nil {
@@ -59,6 +62,6 @@ func sendChat(p *card.Player) {
 		return
 	}
 
-	p.SendChat(message)
+	player.SendChat(m, message)
 	time.Sleep(time.Millisecond * 10)
 }

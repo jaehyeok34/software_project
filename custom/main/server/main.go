@@ -2,9 +2,10 @@ package main
 
 import (
 	"log"
-	suffle "software/custom/game/card/system/shuffle"
+	"software/custom/game/card/system/shuffle"
 	"software/import/room"
 	"software/import/system/chat"
+	"software/import/system/chat/decorator/client"
 	"software/import/system/chat/decorator/timestamp"
 	"time"
 )
@@ -18,10 +19,15 @@ func main() {
 
 	chatSystem := chat.New()
 	room.AddSystem(chat.Key, chatSystem)
-	room.AddSystem(suffle.Key, suffle.New())
+	room.AddSystem(shuffle.Key, shuffle.New())
 
 	time.Sleep(time.Second * 5)
-	room.UpdateSystem(chat.Key, timestamp.New(chatSystem))
+	timestamp := timestamp.New(chatSystem)
+	room.UpdateSystem(chat.Key, timestamp)
+
+	time.Sleep(time.Second * 3)
+	client := client.New(timestamp)
+	room.UpdateSystem(chat.Key, client)
 
 	for {
 	}

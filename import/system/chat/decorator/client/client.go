@@ -1,10 +1,9 @@
-package timestamp
+package client
 
 import (
 	"fmt"
 	"net"
 	"software/import/room"
-	"time"
 )
 
 type System struct {
@@ -22,7 +21,7 @@ func New(system room.System) *System {
 func (s *System) Run(src *room.Connection, conns []net.Conn, args ...interface{}) {
 	for i, arg := range args {
 		if v, ok := arg.(string); ok {
-			args[i] = fmt.Sprintf("[%s] %s", time.Now().Format("15:04:05"), v)
+			args[i] = fmt.Sprintf("%s: %s", src.Name, v)
 		}
 	}
 	s.System.Run(src, conns, args...)

@@ -1,14 +1,20 @@
 package client
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 	"software/import/socket"
+
 	"sync"
 )
 
+type Name struct {
+	Value string `json:"value"`
+}
+
 type Model struct {
-	Name string
+	Name *Name
 	Mu   sync.RWMutex
 	Conn net.Conn
 	Ch   chan *socket.Frame
@@ -16,7 +22,7 @@ type Model struct {
 
 func New(name string) *Model {
 	return &Model{
-		Name: name,
+		Name: &Name{Value: name},
 		Ch:   make(chan *socket.Frame),
 	}
 }
@@ -42,16 +48,23 @@ func (m *Model) Connect(network string, address string) error {
 	}
 
 	m.Conn = conn
+
+	e := json.NewEncoder(conn)
+	if err := e.Encode(m.Name); err != nil {
+		fmt.Println("json encode error:", err)
+		return err
+	}
+
 	return nil
 }
 
-func (c *Model) Listen() {
+func (m *Model) Listen() {
 	for {
-		f, err := socket.Read(c.Conn)
+		f, err := socket.Read(m.Conn)
 		if err != nil {
 			fmt.Println("Listen 문제:", err)
 		}
 
-		c.Ch <- f
+		m.Ch <- f
 	}
 }
