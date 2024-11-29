@@ -3,7 +3,7 @@ package room
 import (
 	"fmt"
 	"net"
-	"software/socket"
+	"software/import/socket"
 	"sync"
 )
 

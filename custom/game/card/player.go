@@ -3,17 +3,18 @@ package card
 import (
 	"fmt"
 	"net"
-	"software/socket"
+	"software/import/socket"
 	"sync"
 )
 
 type Player struct {
+	Name string
 	mu   sync.RWMutex
 	Conn net.Conn
 }
 
-func New() *Player {
-	return &Player{}
+func New(name string) *Player {
+	return &Player{Name: name}
 }
 
 func (c *Player) ConnectAndListen(network string, address string) error {

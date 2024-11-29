@@ -3,11 +3,12 @@ package chat
 import (
 	"fmt"
 	"net"
-	"software/room"
-	"software/socket"
+	"software/import/socket"
 )
 
 type System struct{}
+
+var Key string = "chat"
 
 func New() *System {
 	return &System{}
@@ -37,5 +38,3 @@ func (cs *System) Run(conns []net.Conn, args ...interface{}) {
 		socket.Write(conn, res)
 	}
 }
-
-var _ room.System = &System{}
