@@ -2,9 +2,9 @@ package chat
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"software/room"
+	"software/socket"
 )
 
 type System struct{}
@@ -14,7 +14,6 @@ func New() *System {
 }
 
 func (cs *System) Run(conns []net.Conn, args ...interface{}) {
-	fmt.Println("---ChatSystem(Run)---")
 	if len(conns) == 0 {
 		fmt.Println("ChatSystem(Run): missing []net.Conn")
 		return
@@ -31,12 +30,11 @@ func (cs *System) Run(conns []net.Conn, args ...interface{}) {
 		fmt.Println("ChatSystem(Run): missing message(string)")
 	}
 
-	for i, conn := range conns {
-		_, err := conn.Write([]byte(message))
-		if err != nil {
-			log.Fatal("ChatSystem(Run):", err, "index:", i)
-		}
-
+	fmt.Println("received:", message)
+	for _, conn := range conns {
+		res := new(socket.Frame)
+		res.Args = append(res.Args, message)
+		_ = conn
 	}
 }
 

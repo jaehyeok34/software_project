@@ -3,15 +3,13 @@ package card
 import (
 	"fmt"
 	"net"
+	"software/socket"
 	"sync"
 )
 
 type Player struct {
-	ID    int
-	Cards []string
-
 	mu   sync.RWMutex
-	conn net.Conn
+	Conn net.Conn
 }
 
 func NewPlayer() *Player {
@@ -28,23 +26,20 @@ func (c *Player) Connect(network string, address string) error {
 		return err
 	}
 
-	c.conn = conn
+	c.Conn = conn
 	return nil
 }
 
-func (c *Player) SendChat() {
-	go func() {
-		for {
-			var input string
-			fmt.Print("> ")
-			fmt.Scan(&input)
+func (c *Player) Chat(message string) error {
+	req := new(socket.Frame)
+	req.Event = "chat"
+	req.Args = append(req.Args, message)
 
-			c.mu.RLock()
-			_, err := c.conn.Write([]byte(input))
-			if err != nil {
-				fmt.Println("Player/SendChat():", err)
-			}
-			c.mu.RUnlock()
-		}
-	}()
+	err := socket.Write(c.Conn, req)
+	if err != nil {
+		fmt.Println("Chat Write 문제 발생:", err)
+		return err
+	}
+
+	return nil
 }

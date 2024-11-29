@@ -3,7 +3,6 @@ package room
 import (
 	"fmt"
 	"net"
-	"software/socket"
 	"time"
 )
 
@@ -50,21 +49,12 @@ func (s *Server) Serve() {
 		s.mu.RLock()
 		for i, client := range s.clients {
 			go s.read(client)
-			fmt.Println(i, "번 쨰 client 데이터 읽는 중")
+			fmt.Println(i+1, "번 쨰 client 데이터 읽는 중")
 		}
 		s.mu.RUnlock()
 
 		time.Sleep(time.Second)
 	}
-}
-
-func (s *Server) read(conn net.Conn) {
-	data, err := socket.Receive(conn)
-	if err != nil {
-		fmt.Println("read error:", err)
-	}
-
-	fmt.Println(string(data))
 }
 
 func (s *Server) Append(conn net.Conn) {
