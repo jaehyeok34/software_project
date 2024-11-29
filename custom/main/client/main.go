@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"software/custom/game/card"
+	"time"
 )
 
 func main() {
@@ -18,13 +19,43 @@ func main() {
 
 	for {
 		// ---------------테스트용 코드임 삭제하셈--------------------
-		scanner := bufio.NewScanner(os.Stdin)
-		if scanner.Scan() {
-			p.SendChat(scanner.Text())
+		fmt.Println("1. 채팅")
+		message, err := scanner()
+		if err != nil {
+			fmt.Println("scanner error")
+			return
 		}
 
-		if err := scanner.Err(); err != nil {
-			fmt.Println("스캔에 문제 생김")
+		switch message {
+		case "1":
+			sendChat(p)
 		}
 	}
+}
+
+func scanner() (string, error) {
+	var message string
+
+	scanner := bufio.NewScanner(os.Stdin)
+	if scanner.Scan() {
+		message = scanner.Text()
+	}
+
+	if err := scanner.Err(); err != nil {
+		return "", err
+	}
+
+	return message, nil
+}
+
+func sendChat(p *card.Player) {
+	fmt.Print("> ")
+	message, err := scanner()
+	if err != nil {
+		fmt.Println("scanner error")
+		return
+	}
+
+	p.SendChat(message)
+	time.Sleep(time.Millisecond * 10)
 }

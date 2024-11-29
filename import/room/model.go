@@ -60,13 +60,10 @@ func (m *Model) Append(conn net.Conn) {
 
 func (m *Model) read(conn net.Conn) {
 	for {
-		fmt.Println("읽기 중...")
 		req, err := socket.Read(conn) // blocking
 		if err != nil {
 			fmt.Println("read error:", err)
 		}
-
-		fmt.Println("읽기 성공")
 
 		m.run(req.Event, req.Args...)
 	}
@@ -82,5 +79,4 @@ func (m *Model) run(key string, args ...interface{}) {
 	}
 
 	m.systems[key].Run(m.clients, args...)
-	fmt.Println("처리 완료")
 }
