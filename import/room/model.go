@@ -10,14 +10,16 @@ import (
 type Model struct {
 	mu       sync.RWMutex
 	Listener net.Listener
-	clients  []net.Conn
+	clients  map[uint]net.Conn
 	systems  map[string]System
 }
+
+var index uint = 0
 
 func New() *Model {
 	return &Model{
 		Listener: nil,
-		clients:  make([]net.Conn, 0),
+		clients:  make(map[uint]net.Conn),
 		systems:  make(map[string]System),
 	}
 }
@@ -52,17 +54,22 @@ func (m *Model) Append(conn net.Conn) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	m.clients = append(m.clients, conn)
+	index++
+	m.clients[index] = conn
 	fmt.Println("현재 클라이언트 수:", len(m.clients))
 
-	go m.read(conn)
+	go m.read(index, conn)
 }
 
-func (m *Model) read(conn net.Conn) {
+func (m *Model) read(key uint, conn net.Conn) {
 	for {
+		fmt.Println(key, "read 하는 중")
 		req, err := socket.Read(conn) // blocking
 		if err != nil {
-			fmt.Println("read error:", err)
+			fmt.Println(key, "read error:", err)
+			delete(m.clients, key)
+			fmt.Println("삭제 후:", len(m.clients))
+			return
 		}
 
 		m.run(conn, req.Event, req.Args...)
@@ -78,5 +85,10 @@ func (m *Model) run(src net.Conn, key string, args ...interface{}) {
 		return
 	}
 
-	m.systems[key].Run(src, m.clients, args...)
+	var conns []net.Conn
+	for _, conn := range m.clients {
+		conns = append(conns, conn)
+	}
+
+	m.systems[key].Run(src, conns, args...)
 }

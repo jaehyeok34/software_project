@@ -17,8 +17,8 @@ func main() {
 
 	go p.Process()
 
+	// UI(CLI 기반)
 	for {
-		// ---------------테스트용 코드임 삭제하셈--------------------
 		fmt.Println("1. 채팅, 2. 셔플")
 		message, err := scanner()
 		if err != nil {
