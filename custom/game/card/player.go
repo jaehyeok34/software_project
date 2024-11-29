@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"software/import/socket"
+	"software/import/system/chat"
 	"sync"
 )
 
@@ -54,7 +55,7 @@ func (c *Player) Listen() {
 
 func (c *Player) Chat(message string) error {
 	req := new(socket.Frame)
-	req.Event = "chat"
+	req.Event = chat.Key
 	req.Args = append(req.Args, message)
 
 	err := socket.Write(c.Conn, req)

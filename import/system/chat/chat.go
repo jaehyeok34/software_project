@@ -34,6 +34,7 @@ func (cs *System) Run(conns []net.Conn, args ...interface{}) {
 	fmt.Println("received:", message)
 	for _, conn := range conns {
 		res := new(socket.Frame)
+		res.Event = Key
 		res.Args = append(res.Args, message)
 		socket.Write(conn, res)
 	}
