@@ -21,11 +21,11 @@ func main() {
 	room.AddSystem(chat.Key, chatSystem)
 	room.AddSystem(shuffle.Key, shuffle.New())
 
-	time.Sleep(time.Second * 5)
+	time.Sleep(time.Second * 10)
 	timestamp := timestamp.New(chatSystem)
 	room.UpdateSystem(chat.Key, timestamp)
 
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Second * 10)
 	client := client.New(timestamp)
 	room.UpdateSystem(chat.Key, client)
 
