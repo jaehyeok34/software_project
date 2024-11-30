@@ -9,7 +9,7 @@ import (
 
 type System struct{}
 
-var Key string = "suffle"
+var Key string = "shuffle"
 
 func New() *System {
 	return &System{}

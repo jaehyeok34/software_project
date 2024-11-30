@@ -26,7 +26,7 @@ func SendChat(m *client.Model, message string) error {
 	return nil
 }
 
-func Suffle(m *client.Model) error {
+func Shuffle(m *client.Model) error {
 	m.Mu.RLock()
 	defer m.Mu.RUnlock()
 
@@ -36,7 +36,7 @@ func Suffle(m *client.Model) error {
 
 	err := socket.Write(m.Conn, f)
 	if err != nil {
-		fmt.Println("Suffle Write 문제 발생:", err)
+		fmt.Println("Shuffle Write 문제 발생:", err)
 		return err
 	}
 

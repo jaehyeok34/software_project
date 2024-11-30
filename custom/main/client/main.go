@@ -34,7 +34,7 @@ func main() {
 			sendChat(m)
 
 		case "2":
-			player.Suffle(m)
+			player.Shuffle(m)
 		}
 	}
 }
