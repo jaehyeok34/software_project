@@ -29,7 +29,7 @@ func New() *Model {
 	}
 }
 
-func (m *Model) Listen(network string, address string) error {
+func (m *Model) Listen(network string, address string, n uint) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -40,12 +40,12 @@ func (m *Model) Listen(network string, address string) error {
 
 	m.Listener = server
 
-	go m.Accept()
+	go m.Accept(n)
 	return nil
 }
 
-func (m *Model) Accept() {
-	for {
+func (m *Model) Accept(n uint) {
+	for len(m.clients) < int(n) {
 		conn, err := m.Listener.Accept()
 		if err != nil {
 			fmt.Println("클라이언트를 받아들이는 데 문제가 생김", err)
