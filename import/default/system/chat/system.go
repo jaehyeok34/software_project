@@ -2,18 +2,16 @@ package chat
 
 import (
 	"fmt"
-	"software/server"
-	"software/socket"
+	"software/import/server"
+	"software/import/socket"
 )
 
 type System struct{}
 
+var Event = "chat"
+
 func New() *System {
 	return new(System)
-}
-
-func (s *System) Event() string {
-	return "chat"
 }
 
 func (s *System) Run(src *server.Session, dsts []*server.Session, frame *socket.Frame) {
@@ -30,4 +28,4 @@ func (s *System) Run(src *server.Session, dsts []*server.Session, frame *socket.
 	}
 }
 
-var _ server.System = &System{}
+var _ server.System = new(System)

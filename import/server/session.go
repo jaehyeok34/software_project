@@ -2,7 +2,7 @@ package server
 
 import (
 	"net"
-	"software/socket"
+	"software/import/socket"
 )
 
 type Session struct {

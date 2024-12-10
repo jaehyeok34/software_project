@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
-	"software/client"
-	"software/socket"
-	"software/system/chat"
+	"software/import/client"
+	"software/import/default/process/chat"
+	"software/import/socket"
 )
 
 func main() {
@@ -15,21 +15,30 @@ func main() {
 	client.Connect("tcp", "localhost:9999")
 	go client.Listen()
 
+	client.UpsertProcess(chat.Event, new(chat.Process))
 	for {
-		var message string
+		fmt.Println("1. 채팅")
+		var input string
 		scanner := bufio.NewScanner(os.Stdin)
 		if scanner.Scan() {
-			message = scanner.Text()
+			input = scanner.Text()
 		}
 
 		if err := scanner.Err(); err != nil {
 			return
 		}
 
-		socket.Write(client.Server, &socket.Frame{
-			Meta:  *client.Meta,
-			Event: chat.New().Event(),
-			Args:  []interface{}{message},
-		})
+		var event string
+		switch input {
+		case "1":
+			event = chat.Event
+		}
+
+		process := client.Processes[event]
+		if process == nil {
+			continue
+		}
+
+		process.Request(client.Meta, client.Server)
 	}
 }

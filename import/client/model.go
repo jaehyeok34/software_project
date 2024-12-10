@@ -4,19 +4,24 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"software/socket"
+	"software/import/socket"
+	"sync"
 )
 
 type Model struct {
-	Meta    *socket.Metadata
-	Server  net.Conn
-	FrameCh chan *socket.Frame
+	Meta      *socket.Metadata
+	Server    net.Conn
+	FrameCh   chan *socket.Frame
+	Processes map[string]Process
+
+	mu sync.RWMutex
 }
 
 func New(meta *socket.Metadata) *Model {
 	return &Model{
-		Meta:    meta,
-		FrameCh: make(chan *socket.Frame),
+		Meta:      meta,
+		FrameCh:   make(chan *socket.Frame),
+		Processes: make(map[string]Process),
 	}
 }
 
@@ -43,6 +48,8 @@ func (m *Model) Listen() {
 			continue
 		}
 
-		m.FrameCh <- frame
+		m.mu.RLock()
+		m.Processes[frame.Event].Response(frame)
+		m.mu.RUnlock()
 	}
 }

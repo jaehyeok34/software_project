@@ -1,15 +1,14 @@
 package server
 
-import "software/socket"
+import "software/import/socket"
 
 type System interface {
 	Run(src *Session, dsts []*Session, frame *socket.Frame)
-	Event() string
 }
 
-func (m *Model) UpsertSystem(system System) {
+func (m *Model) UpsertSystem(event string, system System) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	m.systems[system.Event()] = system
+	m.systems[event] = system
 }

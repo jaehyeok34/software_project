@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"software/socket"
+	"software/import/socket"
 	"sync"
 )
 
