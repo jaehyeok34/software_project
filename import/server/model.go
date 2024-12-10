@@ -11,7 +11,6 @@ import (
 type Model struct {
 	listener net.Listener
 	capacity uint16
-
 	mu       sync.RWMutex
 	sessions map[string]*Session
 	systems  map[string]System

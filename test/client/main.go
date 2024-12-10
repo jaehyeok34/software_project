@@ -34,7 +34,7 @@ func main() {
 			event = chat.Event
 		}
 
-		process := client.Processes[event]
+		process := client.GetProcess(event)
 		if process == nil {
 			continue
 		}

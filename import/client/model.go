@@ -9,19 +9,17 @@ import (
 )
 
 type Model struct {
-	Meta      *socket.Metadata
-	Server    net.Conn
-	FrameCh   chan *socket.Frame
-	Processes map[string]Process
+	Meta   *socket.Metadata
+	Server net.Conn
 
-	mu sync.RWMutex
+	processes map[string]Process
+	mu        sync.RWMutex
 }
 
 func New(meta *socket.Metadata) *Model {
 	return &Model{
 		Meta:      meta,
-		FrameCh:   make(chan *socket.Frame),
-		Processes: make(map[string]Process),
+		processes: make(map[string]Process),
 	}
 }
 
@@ -49,7 +47,7 @@ func (m *Model) Listen() {
 		}
 
 		m.mu.RLock()
-		m.Processes[frame.Event].Response(frame)
+		m.processes[frame.Event].Response(frame)
 		m.mu.RUnlock()
 	}
 }

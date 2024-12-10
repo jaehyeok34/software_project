@@ -14,5 +14,12 @@ func (m *Model) UpsertProcess(event string, process Process) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	m.Processes[event] = process
+	m.processes[event] = process
+}
+
+func (m *Model) GetProcess(event string) Process {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	return m.processes[event]
 }
