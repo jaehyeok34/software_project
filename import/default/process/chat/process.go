@@ -14,6 +14,10 @@ type Process struct{}
 
 var Event = "chat"
 
+func New() *Process {
+	return new(Process)
+}
+
 func (p *Process) Request(meta *socket.Metadata, server net.Conn) error {
 	frame := new(socket.Frame)
 	frame.Meta = meta

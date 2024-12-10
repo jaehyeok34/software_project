@@ -17,7 +17,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	client.UpsertProcess(chat.Event, new(chat.Process))
+	client.UpsertProcess(chat.Event, chat.New())
 	for {
 		fmt.Println("1. 채팅")
 		var input string
