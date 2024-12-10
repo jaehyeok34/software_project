@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
 	"software/import/client"
@@ -12,8 +13,9 @@ import (
 
 func main() {
 	client := client.New(&socket.Metadata{Name: fmt.Sprintf("%s%d", "클라", rand.Int())})
-	client.Connect("tcp", "localhost:9999")
-	go client.Listen()
+	if err := client.ConnectAndListen("tcp", "localhost:9999"); err != nil {
+		log.Fatal(err)
+	}
 
 	client.UpsertProcess(chat.Event, new(chat.Process))
 	for {
@@ -39,6 +41,6 @@ func main() {
 			continue
 		}
 
-		process.Request(client.Meta, client.Server)
+		process.Request(client.Meta, client.GetServer())
 	}
 }

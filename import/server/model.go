@@ -4,22 +4,22 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"software/import/collection"
 	"software/import/socket"
-	"sync"
 )
 
 type Model struct {
 	listener net.Listener
 	capacity uint16
-	mu       sync.RWMutex
-	sessions map[string]*Session
-	systems  map[string]System
+
+	sessions *collection.Map[string, *Session]
+	systems  *collection.Map[string, System]
 }
 
 func New() *Model {
 	return &Model{
-		sessions: make(map[string]*Session),
-		systems:  make(map[string]System),
+		sessions: collection.NewMap[string, *Session](),
+		systems:  collection.NewMap[string, System](),
 	}
 }
 
@@ -42,7 +42,9 @@ func (m *Model) Accept() {
 			continue
 		}
 
-		if len(m.sessions) >= int(m.capacity) {
+		if cap, ok := m.sessions.Read(func(storage map[string]*Session) any {
+			return len(storage)
+		}).(int); ok && cap >= int(m.capacity) {
 			fmt.Println("가득 참")
 			conn.Close()
 			continue
@@ -50,7 +52,7 @@ func (m *Model) Accept() {
 
 		meta, err := socket.RecieveConnection(conn)
 		if err != nil {
-			fmt.Println("연결 실패")
+			fmt.Println("연결 실패", err)
 			continue
 		}
 
@@ -59,22 +61,21 @@ func (m *Model) Accept() {
 }
 
 func (m *Model) AddSession(meta *socket.Metadata, conn net.Conn) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
 	session := &Session{Meta: meta, Conn: conn}
-	m.sessions[meta.Name] = session
-	fmt.Println("현재 클라이언트 수:", len(m.sessions))
+
+	m.sessions.Write(func(storage map[string]*Session) {
+		storage[meta.Name] = session
+		fmt.Println("현재 클라이언트 수:", len(storage))
+	})
 
 	go m.Read(session)
 }
 
 func (m *Model) RemoveSession(session *Session) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	delete(m.sessions, session.Meta.Name)
-	fmt.Println("삭제 후", len(m.sessions))
+	m.sessions.Write(func(storage map[string]*Session) {
+		delete(storage, session.Meta.Name)
+		fmt.Println("삭제 후", len(storage))
+	})
 }
 
 func (m *Model) Read(session *Session) {
@@ -92,23 +93,27 @@ func (m *Model) Read(session *Session) {
 			continue
 		}
 
-		m.Process(session, frame)
+		m.Run(session, frame)
 	}
 }
 
-func (m *Model) Process(session *Session, frame *socket.Frame) {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
+func (m *Model) Run(session *Session, frame *socket.Frame) {
+	system, ok := m.systems.Read(func(storage map[string]System) any {
+		return storage[frame.Event]
+	}).(System)
 
-	system := m.systems[frame.Event]
-	if system == nil {
+	if !ok {
 		return
 	}
 
-	var sessions []*Session
-	for _, s := range m.sessions {
-		sessions = append(sessions, s)
-	}
+	sessions := m.sessions.Read(func(storage map[string]*Session) any {
+		var sessions []*Session
+		for _, session := range storage {
+			sessions = append(sessions, session)
+		}
+
+		return sessions
+	}).([]*Session)
 
 	system.Run(session, sessions, frame)
 }

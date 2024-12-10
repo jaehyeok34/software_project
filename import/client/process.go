@@ -11,15 +11,17 @@ type Process interface {
 }
 
 func (m *Model) UpsertProcess(event string, process Process) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	m.processes[event] = process
+	m.processes.Write(func(storage map[string]Process) {
+		storage[event] = process
+	})
 }
 
 func (m *Model) GetProcess(event string) Process {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
+	if process, ok := m.processes.Read(func(storage map[string]Process) any {
+		return storage[event]
+	}).(Process); ok {
+		return process
+	}
 
-	return m.processes[event]
+	return nil
 }

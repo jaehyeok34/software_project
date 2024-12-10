@@ -7,8 +7,7 @@ type System interface {
 }
 
 func (m *Model) UpsertSystem(event string, system System) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	m.systems[event] = system
+	m.systems.Write(func(storage map[string]System) {
+		storage[event] = system
+	})
 }

@@ -1,31 +1,22 @@
 package main
 
-import (
-	"fmt"
-	"time"
-)
+import "fmt"
 
-type Test struct {
-	List map[string]int
+type T interface {
+	Run()
+}
+
+func TT() any {
+	m := make(map[string]T)
+
+	return m["hello"]
 }
 
 func main() {
-	t := new(Test)
-	t.List = make(map[string]int)
-
-	t.List["key"] = 100
-
-	go func() {
-		for i := 0; i < 100; i++ {
-			fmt.Println(i, ":", t.List["key"])
-			time.Sleep(time.Millisecond * 30)
-		}
-	}()
-
-	time.Sleep(time.Millisecond * 500)
-	fmt.Println("삭제")
-	delete(t.List, "key")
-
-	for {
+	t, ok := TT().(T)
+	if !ok {
+		fmt.Println("???")
 	}
+
+	fmt.Println(t)
 }

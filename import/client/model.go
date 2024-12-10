@@ -4,23 +4,30 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"software/import/collection"
 	"software/import/socket"
-	"sync"
 )
 
 type Model struct {
-	Meta   *socket.Metadata
-	Server net.Conn
-
-	processes map[string]Process
-	mu        sync.RWMutex
+	Meta      *socket.Metadata
+	server    net.Conn
+	processes *collection.Map[string, Process]
 }
 
 func New(meta *socket.Metadata) *Model {
 	return &Model{
 		Meta:      meta,
-		processes: make(map[string]Process),
+		processes: collection.NewMap[string, Process](),
 	}
+}
+
+func (m *Model) ConnectAndListen(network, address string) error {
+	if err := m.Connect(network, address); err != nil {
+		return err
+	}
+
+	go m.Listen()
+	return nil
 }
 
 func (m *Model) Connect(network, address string) error {
@@ -29,16 +36,16 @@ func (m *Model) Connect(network, address string) error {
 		return err
 	}
 
-	m.Server = server
+	m.server = server
 	return socket.RequestConnection(server, m.Meta)
 }
 
 func (m *Model) Listen() {
 	for {
-		frame, err := socket.Read(m.Server)
+		frame, err := socket.Read(m.server)
 		if err != nil {
 			if err == io.EOF {
-				m.Server.Close()
+				m.server.Close()
 				break
 			}
 
@@ -46,8 +53,12 @@ func (m *Model) Listen() {
 			continue
 		}
 
-		m.mu.RLock()
-		m.processes[frame.Event].Response(frame)
-		m.mu.RUnlock()
+		if process := m.GetProcess(frame.Event); process != nil {
+			process.Response(frame)
+		}
 	}
+}
+
+func (m *Model) GetServer() net.Conn {
+	return m.server
 }
