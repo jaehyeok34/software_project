@@ -54,6 +54,6 @@ func (m *Model) processFrame(src *socket.Metadata, frame *socket.Frame) {
 	// 프레임을 처리할 수 있는 프로세스를 process map에서 획득하고
 	// 해당 프로세스가 존재한다면 처리한다.
 	if process, ok := m.processes.Load(frame.Event); ok {
-		process.Run(src, frame, m.sessions.GetAll())
+		go process.Run(src, frame, m.sessions.GetAll())
 	}
 }
