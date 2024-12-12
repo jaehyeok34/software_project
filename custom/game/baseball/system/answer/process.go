@@ -5,7 +5,9 @@ import (
 	"software/custom/game/baseball"
 	"software/import/socket"
 	"software/import/system"
+	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 var Event = "answer"
@@ -20,26 +22,54 @@ func NewProcess(data *baseball.Data) *Process {
 
 // 클라이언트로부터 답안 제출 이벤트를 수신했을 때 처리하는 로직이다.
 func (p *Process) Run(src *socket.Metadata, frame *socket.Frame, sessions []*socket.Session) {
-	// 수신한 프레임에서 답안(string)을 추출한다.
-	var answer string
-	for _, arg := range frame.Args {
+	r := ""
+	if !p.data.IsStart {
+		r = "게임을 먼저 시작해 주세요."
+	} else {
+		r = p.getResulst(frame.Args)
+	}
+
+	frame.Args = append(make([]any, 0), r)
+	for _, session := range sessions {
+		socket.Write(session.Conn, frame)
+	}
+}
+
+// 수신한 프레임으로부터 답안을 추출하고, 결과를 반환한다.
+func (p *Process) getResulst(args []any) string {
+	answer := ""
+	for _, arg := range args {
 		if v, ok := arg.(string); ok {
 			answer = v
 			break
 		}
 	}
 
-	res := ""
-	if answer == p.data.GetGoal() {
-		res = "홈런 !"
-	} else {
-		res = p.calculate(answer)
+	// 수신한 답이 세자리 문자가 아니거나 숫자가 아닐 경우에는 잘못된 입력으로 판단한다.
+	_, err := strconv.Atoi(answer)
+	if utf8.RuneCountInString(answer) != 3 || err != nil {
+		return "잘못된 입력입니다 !"
 	}
 
-	frame.Args = append(make([]any, 0), res)
-	for _, session := range sessions {
-		socket.Write(session.Conn, frame)
+	// 기회를 감소했을 때, 0이라면 게임을 종료한다.
+	p.data.Count--
+	if p.data.Count == 0 {
+		p.data.IsStart = false
+		return "게임 오버 !"
 	}
+
+	// 답을 맞췄을 경우 게임을 종료한다.
+	if answer == p.data.GetGoal() {
+		p.data.IsStart = false
+		return "홈런 !"
+	}
+
+	// n 스트라이크, m 볼의 결과와 남은 기회를 반환한다.
+	return fmt.Sprintf(
+		"%s\n%s",
+		p.calculate(answer),
+		fmt.Sprintf("남은 기회는 %d번 입니다.", p.data.Count),
+	)
 }
 
 // 클라이언트의 답안에서 스트라이크와 볼을 계산한다.

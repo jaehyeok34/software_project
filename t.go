@@ -1,9 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"unicode/utf8"
+)
 
 func main() {
-	var a any = 10
+	s := "12"
 
-	fmt.Println(a.(string))
+	fmt.Println(utf8.RuneCountInString(s))
 }

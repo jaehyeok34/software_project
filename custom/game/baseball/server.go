@@ -9,10 +9,10 @@ type Server struct {
 	data *Data
 }
 
-func NewServer() *Server {
+func NewServer(max int) *Server {
 	return &Server{
 		Model: server.New(),
-		data:  NewData(),
+		data:  NewData(max),
 	}
 }
 

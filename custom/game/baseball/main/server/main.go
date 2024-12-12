@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	server := baseball.NewServer()
+	server := baseball.NewServer(5)
 	if err := server.Listen("tcp", "localhost:9999", 2); err != nil {
 		log.Fatal(err)
 	}

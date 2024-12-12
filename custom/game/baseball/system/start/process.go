@@ -1,6 +1,7 @@
 package start
 
 import (
+	"fmt"
 	"software/custom/game/baseball"
 	"software/import/socket"
 	"software/import/system"
@@ -23,6 +24,7 @@ func (p *Process) Run(src *socket.Metadata, frame *socket.Frame, sessions []*soc
 		msg = "게임이 이미 진행 중 입니다."
 	}
 
+	fmt.Println("답:", p.data.GetGoal())
 	frame.Args = append(make([]any, 0), msg)
 	for _, session := range sessions {
 		socket.Write(session.Conn, frame)

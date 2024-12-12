@@ -7,25 +7,27 @@ import (
 )
 
 type Data struct {
-	goal    []int
-	isStart bool
-	count   int
+	IsStart bool
+	Count   int
+
+	goal []int
+	max  int
 }
 
-func NewData() *Data {
-	return new(Data)
+func NewData(max int) *Data {
+	return &Data{max: max}
 }
 
 // 게임이 시작되면, 목표 숫자와 시작 여부, 답안 제출 횟수를 초기화한다.
 func (d *Data) Init() bool {
 	// 게임이 이미 시작된 상태(초기화 완료)이면, 초기화를 무시한다.
-	if d.isStart {
+	if d.IsStart {
 		return false
 	}
 
 	d.goal = make([]int, 0)
-	d.isStart = true
-	d.count = 0
+	d.IsStart = true
+	d.Count = d.max
 
 	// 세 자리의 숫자를 생성한다.
 	// 생성된 랜덤 값이 중복된 값이 있다면, 재생성한다.
