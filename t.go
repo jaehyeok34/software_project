@@ -1,22 +1,23 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"software/import/collection"
+)
 
-type T interface {
-	Run()
-}
-
-func TT() any {
-	m := make(map[string]T)
-
-	return m["hello"]
+type A struct {
+	Value string
 }
 
 func main() {
-	t, ok := TT().(T)
-	if !ok {
-		fmt.Println("???")
+	m := collection.New[string, *A]()
+	a := &A{Value: "hello"}
+
+	m.Store(a.Value, a)
+
+	if v, ok := m.Load("hello"); ok {
+		fmt.Println(v)
 	}
 
-	fmt.Println(t)
+	fmt.Println(m.Length())
 }

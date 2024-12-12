@@ -7,7 +7,7 @@ import (
 	"math/rand"
 	"os"
 	"software/import/client"
-	"software/import/default/process/chat"
+	"software/import/default/chat"
 	"software/import/socket"
 )
 
@@ -17,7 +17,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	client.UpsertProcess(chat.Event, chat.New())
+	client.UpsertRequest(chat.Event, chat.NewRequest())
+
 	for {
 		fmt.Println("1. 채팅")
 		var input string
@@ -36,11 +37,8 @@ func main() {
 			event = chat.Event
 		}
 
-		process := client.GetProcess(event)
-		if process == nil {
-			continue
+		if request := client.GetRequest(event); request != nil {
+			request.Send(client.Meta, client.GetServer())
 		}
-
-		process.Request(client.Meta, client.GetServer())
 	}
 }

@@ -1,13 +1,13 @@
 package main
 
 import (
-	"software/import/default/system/chat"
+	"software/import/default/chat"
 	"software/import/server"
 )
 
 func main() {
 	server := server.New()
-	server.Listen("tcp", "localhost:9999", 1)
-	server.UpsertSystem(chat.Event, chat.New())
+	server.Listen("tcp", "localhost:9999", 2)
+	server.UpsertProcess(chat.Event, chat.NewProcess())
 	server.Accept()
 }
