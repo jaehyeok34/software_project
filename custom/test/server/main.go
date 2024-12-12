@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"software/import/server"
 	"software/import/system/default/chat"
-	"software/import/system/default/chat/decorator/source"
-	"software/import/system/default/chat/decorator/timestamp"
 	"time"
 )
 
@@ -19,12 +17,12 @@ func main() {
 	go func() {
 		time.Sleep(time.Second * 5)
 		fmt.Println("chat 기능 확장(timestamp)")
-		chatEvent = timestamp.New(chatEvent)
+		chatEvent = chat.NewTimestampDecorator(chatEvent)
 		server.UpsertProcess(chat.Event, chatEvent)
 
 		time.Sleep(time.Second * 5)
 		fmt.Println("chat 기능 확장(source)")
-		chatEvent = source.New(chatEvent)
+		chatEvent = chat.NewSourceDecorator(chatEvent)
 		server.UpsertProcess(chat.Event, chatEvent)
 	}()
 
