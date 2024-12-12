@@ -10,7 +10,7 @@ var Event = "chat"
 
 type Process struct{}
 
-func NewProcess() *Process {
+func NewProcess() system.Process {
 	return new(Process)
 }
 

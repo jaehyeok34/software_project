@@ -9,7 +9,7 @@ import (
 
 type Request struct{}
 
-func NewRequest() *Request {
+func NewRequest() system.Request {
 	return new(Request)
 }
 

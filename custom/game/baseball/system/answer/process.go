@@ -16,7 +16,7 @@ type Process struct {
 	data *baseball.Data
 }
 
-func NewProcess(data *baseball.Data) *Process {
+func NewProcess(data *baseball.Data) system.Process {
 	return &Process{data}
 }
 
