@@ -1,23 +1,9 @@
 package main
 
-import (
-	"fmt"
-	"software/import/collection"
-)
-
-type A struct {
-	Value string
-}
+import "fmt"
 
 func main() {
-	m := collection.NewMap[string, *A]()
-	a := &A{Value: "hello"}
+	var a any = 10
 
-	m.Store(a.Value, a)
-
-	if v, ok := m.Load("hello"); ok {
-		fmt.Println(v)
-	}
-
-	fmt.Println(m.Length())
+	fmt.Println(a.(string))
 }

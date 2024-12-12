@@ -19,14 +19,11 @@ func NewRequest() *Request {
 // implementation
 // 클라이언트가 서버로 채팅 메시지를 보내는 로직이다.
 func (r *Request) Send(src *socket.Metadata, dst net.Conn) {
-	frame := &socket.Frame{
+	socket.Write(dst, &socket.Frame{
 		Meta:  src,
 		Event: Event,
-		Args:  make([]any, 0),
-	}
-
-	frame.Args = append(frame.Args, r.GetMessage())
-	socket.Write(dst, frame)
+		Args:  append(make([]any, 0), r.getMessage()),
+	})
 }
 
 // implementation
@@ -40,7 +37,7 @@ func (r *Request) Process(frame *socket.Frame) {
 }
 
 // 키보드(os.Stdin)로부터 문자열을 입력받아 반환한다.
-func (r *Request) GetMessage() string {
+func (r *Request) getMessage() string {
 	var msg string
 	scanner := bufio.NewScanner(os.Stdin)
 	if scanner.Scan() {
