@@ -59,7 +59,7 @@ func (m *Model) Listen() {
 
 		// 적절한 처리함수를 조회하고, 있다면 호출한다.
 		if request := m.GetRequest(frame.Event); request != nil {
-			request.Process(frame)
+			go request.Process(frame)
 		}
 	}
 }
