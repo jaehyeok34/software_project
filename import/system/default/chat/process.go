@@ -8,15 +8,15 @@ import (
 
 var Event = "chat"
 
-type Process struct{}
+type process struct{}
 
 func NewProcess() system.Process {
-	return new(Process)
+	return new(process)
 }
 
 // implementation
 // 서버가 "chat" 이벤트를 수신했을 때, 처리하는 로직이다.
-func (p *Process) Run(src *socket.Metadata, frame *socket.Frame, sessions []*socket.Session) {
+func (p *process) Run(src *socket.Metadata, frame *socket.Frame, sessions []*socket.Session) {
 	// 프레임에서 메시지(string)만 추출한다.
 	var messages []string
 	for _, arg := range frame.Args {
@@ -32,4 +32,4 @@ func (p *Process) Run(src *socket.Metadata, frame *socket.Frame, sessions []*soc
 	}
 }
 
-var _ system.Process = new(Process)
+var _ system.Process = new(process)

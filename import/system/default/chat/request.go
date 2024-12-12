@@ -10,15 +10,15 @@ import (
 	"software/import/system"
 )
 
-type Request struct{}
+type request struct{}
 
 func NewRequest() system.Request {
-	return new(Request)
+	return new(request)
 }
 
 // implementation
 // 클라이언트가 서버로 채팅 메시지를 보내는 로직이다.
-func (r *Request) Send(src *socket.Metadata, dst net.Conn) {
+func (r *request) Send(src *socket.Metadata, dst net.Conn) {
 	socket.Write(dst, &socket.Frame{
 		Meta:  src,
 		Event: Event,
@@ -28,7 +28,7 @@ func (r *Request) Send(src *socket.Metadata, dst net.Conn) {
 
 // implementation
 // 서버로부터 채팅 메시지의 처리 결과를 받아 처리하는 로직이다.
-func (r *Request) Process(frame *socket.Frame) {
+func (r *request) Process(frame *socket.Frame) {
 	for _, arg := range frame.Args {
 		if msg, ok := arg.(string); ok {
 			fmt.Println("받은 메시지:", msg)
@@ -37,7 +37,7 @@ func (r *Request) Process(frame *socket.Frame) {
 }
 
 // 키보드(os.Stdin)로부터 문자열을 입력받아 반환한다.
-func (r *Request) getMessage() string {
+func (r *request) getMessage() string {
 	var msg string
 	scanner := bufio.NewScanner(os.Stdin)
 	if scanner.Scan() {
@@ -52,4 +52,4 @@ func (r *Request) getMessage() string {
 	return msg
 }
 
-var _ system.Request = new(Request)
+var _ system.Request = new(request)

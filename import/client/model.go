@@ -64,6 +64,7 @@ func (m *Model) Listen() {
 	}
 }
 
+// Request 구현체를 추가한다.
 func (m *Model) UpsertRequest(event string, request system.Request) {
 	m.requests.Store(event, request)
 }
