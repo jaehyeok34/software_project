@@ -10,14 +10,14 @@ import (
 	"software/import/system"
 )
 
-type Request struct{}
+type request struct{}
 
 func NewRequest() system.Request {
-	return new(Request)
+	return new(request)
 }
 
 // 서버에 답안 제출 이벤트를 전송한다.
-func (r *Request) Send(src *socket.Metadata, dst net.Conn) {
+func (r *request) Send(src *socket.Metadata, dst net.Conn) {
 	socket.Write(dst, &socket.Frame{
 		Meta:  src,
 		Event: Event,
@@ -26,7 +26,7 @@ func (r *Request) Send(src *socket.Metadata, dst net.Conn) {
 }
 
 // 서버에 제출한 답안에 대한 결과를 처리한다.
-func (r *Request) Process(frame *socket.Frame) {
+func (r *request) Process(frame *socket.Frame) {
 	for _, arg := range frame.Args {
 		if answer, ok := arg.(string); ok {
 			fmt.Println(answer)
@@ -34,7 +34,7 @@ func (r *Request) Process(frame *socket.Frame) {
 	}
 }
 
-func (r *Request) getAnswer() string {
+func (r *request) getAnswer() string {
 	var answer string
 
 	scn := bufio.NewScanner(os.Stdin)
@@ -50,4 +50,4 @@ func (r *Request) getAnswer() string {
 	return answer
 }
 
-var _ system.Request = new(Request)
+var _ system.Request = new(request)

@@ -12,16 +12,16 @@ import (
 
 var Event = "answer"
 
-type Process struct {
+type process struct {
 	data *baseball.Data
 }
 
 func NewProcess(data *baseball.Data) system.Process {
-	return &Process{data}
+	return &process{data}
 }
 
 // 클라이언트로부터 답안 제출 이벤트를 수신했을 때 처리하는 로직이다.
-func (p *Process) Run(src *socket.Metadata, frame *socket.Frame, sessions []*socket.Session) {
+func (p *process) Run(src *socket.Metadata, frame *socket.Frame, sessions []*socket.Session) {
 	r := ""
 	if !p.data.IsStart {
 		r = "게임을 먼저 시작해 주세요."
@@ -36,7 +36,7 @@ func (p *Process) Run(src *socket.Metadata, frame *socket.Frame, sessions []*soc
 }
 
 // 수신한 프레임으로부터 답안을 추출하고, 결과를 반환한다.
-func (p *Process) getResulst(args []any) string {
+func (p *process) getResulst(args []any) string {
 	answer := ""
 	for _, arg := range args {
 		if v, ok := arg.(string); ok {
@@ -73,7 +73,7 @@ func (p *Process) getResulst(args []any) string {
 }
 
 // 클라이언트의 답안에서 스트라이크와 볼을 계산한다.
-func (p *Process) calculate(answer string) string {
+func (p *process) calculate(answer string) string {
 	strike, ball := 0, 0
 	for i, x := range answer {
 		index := strings.Index(p.data.GetGoal(), string(x))
@@ -94,4 +94,4 @@ func (p *Process) calculate(answer string) string {
 	return fmt.Sprintf("%d 스트라이크, %d 볼", strike, ball)
 }
 
-var _ system.Process = new(Process)
+var _ system.Process = new(process)

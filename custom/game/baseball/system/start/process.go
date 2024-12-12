@@ -9,16 +9,16 @@ import (
 
 var Event = "start"
 
-type Process struct {
+type process struct {
 	data *baseball.Data
 }
 
 func NewProcess(data *baseball.Data) system.Process {
-	return &Process{data}
+	return &process{data}
 }
 
 // 클라이언트로부터 시작 이벤트를 전달 받으면 이를 처리하는 로직이다.
-func (p *Process) Run(src *socket.Metadata, frame *socket.Frame, sessions []*socket.Session) {
+func (p *process) Run(src *socket.Metadata, frame *socket.Frame, sessions []*socket.Session) {
 	msg := "게임이 시작됐습니다. 숫자를 입력해 주세요"
 	if !p.data.Init() {
 		msg = "게임이 이미 진행 중 입니다."
@@ -31,4 +31,4 @@ func (p *Process) Run(src *socket.Metadata, frame *socket.Frame, sessions []*soc
 	}
 }
 
-var _ system.Process = new(Process)
+var _ system.Process = new(process)
