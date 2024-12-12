@@ -9,7 +9,7 @@ type Map[T, U any] struct {
 	length  int
 }
 
-func New[T, U any]() *Map[T, U] {
+func NewMap[T, U any]() *Map[T, U] {
 	return &Map[T, U]{}
 }
 
@@ -45,30 +45,3 @@ func (m *Map[T, U]) GetAll() []U {
 
 	return values
 }
-
-// type Map[T comparable, U any] struct {
-// 	mu    sync.RWMutex
-// 	store map[T]U
-// }
-
-// func New[T comparable, U any]() *Map[T, U] {
-// 	return &Map[T, U]{
-// 		store: make(map[T]U),
-// 	}
-// }
-
-// func (m *Map[T, U]) Write[V any](write func(store map[T]U)) {
-// 	m.mu.Lock()
-// 	defer m.mu.Unlock()
-
-// 	write(m.store)
-// }
-
-// func (m *Map[T, U]) Read(read func(store map[T]U) any, result chan any) {
-// 	m.mu.RLock()
-// 	defer m.mu.RUnlock()
-
-// 	result <- read(m.store)
-
-// 	// return read(m.store)
-// }

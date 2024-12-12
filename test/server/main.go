@@ -1,8 +1,8 @@
 package main
 
 import (
-	"software/import/default/chat"
 	"software/import/server"
+	"software/import/system/default/chat"
 )
 
 func main() {

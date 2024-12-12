@@ -18,8 +18,8 @@ type Model struct {
 
 func New() *Model {
 	return &Model{
-		sessions:  collection.New[string, *socket.Session](),
-		processes: collection.New[string, system.Process](),
+		sessions:  collection.NewMap[string, *socket.Session](),
+		processes: collection.NewMap[string, system.Process](),
 	}
 }
 
@@ -44,15 +44,7 @@ func (m *Model) Accept() {
 			continue
 		}
 
-		// race condition을 해결하기 위한 로직이다.
-		// 현재 session map의 저장된 데이터 개수를 반환받고(int), 허용량보다 크다면 접속을 해제한다.
-		// if cap, ok := m.sessions.Read(func(store map[string]*socket.Session) any {
-		// 	return len(store) // int
-		// }).(int); ok && cap >= int(m.capacity) {
-		// 	fmt.Println("가득 참")
-		// 	conn.Close()
-		// 	continue
-		// }
+		// 현재 session map에 저장된 데이터 개수를 반환받고, 허용량보다 크다면 접속을 해제한다.
 		if m.sessions.Length() >= int(m.capacity) {
 			fmt.Println("가득 참")
 			conn.Close()

@@ -7,8 +7,8 @@ import (
 	"math/rand"
 	"os"
 	"software/import/client"
-	"software/import/default/chat"
 	"software/import/socket"
+	"software/import/system/default/chat"
 )
 
 func main() {

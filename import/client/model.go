@@ -18,7 +18,7 @@ type Model struct {
 func New(meta *socket.Metadata) *Model {
 	return &Model{
 		Meta:     meta,
-		requests: collection.New[string, system.Request](),
+		requests: collection.NewMap[string, system.Request](),
 	}
 }
 

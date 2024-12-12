@@ -10,7 +10,7 @@ type A struct {
 }
 
 func main() {
-	m := collection.New[string, *A]()
+	m := collection.NewMap[string, *A]()
 	a := &A{Value: "hello"}
 
 	m.Store(a.Value, a)
